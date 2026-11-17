@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claimcheck"
+version = "0.1.0"
+description = "Tie every published number to a tracked run manifest, and fail CI when a document disagrees with its evidence."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Alessio Brillo" }]
+requires-python = ">=3.11"
+dependencies = []
+keywords = ["reproducibility", "research", "provenance", "ci", "machine-learning"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.4"]
+
+[project.scripts]
+claimcheck = "claimcheck.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
