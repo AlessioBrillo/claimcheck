@@ -26,7 +26,9 @@ def commit_all(root: Path) -> None:
     git(root, "commit", "-q", "-m", "x")
 
 
-def write_manifest(root: Path, name: str = "run", acc: tuple[float, ...] = (0.80, 0.90), **over) -> Path:
+def write_manifest(
+    root: Path, name: str = "run", acc: tuple[float, ...] = (0.80, 0.90), **over
+) -> Path:
     rows = [{"acc": a} for a in acc]
     m = Manifest(
         experiment=name,
@@ -167,7 +169,10 @@ def test_a_table_number_the_manifest_does_not_hold_is_caught(repo: Path) -> None
 
 def test_numbers_that_are_the_manifest_rounded_or_derived_pass(repo: Path) -> None:
     write_manifest(repo)
-    good_doc(repo, "| acc | n | share |\n|---|---|---|\n| 0.85 | 12 | 85% |\n| 0.8 | 2024-01-02 | 0.85 / 100 |\n")
+    good_doc(
+        repo,
+        "| acc | n | share |\n|---|---|---|\n| 0.85 | 12 | 85% |\n| 0.8 | 2024-01-02 | 0.85 / 100 |\n",
+    )
     commit_all(repo)
     assert audit(repo, audit_cfg()) == []
 
@@ -182,9 +187,13 @@ def test_a_row_that_declares_no_tracked_manifest_is_exempt(repo: Path) -> None:
 def test_a_retracted_sentence_coming_back_is_caught(repo: Path) -> None:
     (repo / "README.md").write_text("It never groks.\n")
     commit_all(repo)
-    cfg = AuditConfig(retractions=[Retraction("README.md", "never groks", "it groks, see run.json", "2026-01-01")])
+    cfg = AuditConfig(
+        retractions=[Retraction("README.md", "never groks", "it groks, see run.json", "2026-01-01")]
+    )
     problems = audit(repo, cfg)
-    assert problems == ["README.md: still says 'never groks' (retracted 2026-01-01: it groks, see run.json)"]
+    assert problems == [
+        "README.md: still says 'never groks' (retracted 2026-01-01: it groks, see run.json)"
+    ]
     (repo / "README.md").write_text("It groks.\n")
     assert audit(repo, cfg) == []
 
@@ -192,7 +201,9 @@ def test_a_retracted_sentence_coming_back_is_caught(repo: Path) -> None:
 def test_the_index_must_list_every_tracked_manifest(repo: Path) -> None:
     write_manifest(repo, "run")
     write_manifest(repo, "other")
-    (repo / "INDEX.md").write_text("| `results/run.json` | RESULTS | active |\n| `results/gone.json` | - | - |\n")
+    (repo / "INDEX.md").write_text(
+        "| `results/run.json` | RESULTS | active |\n| `results/gone.json` | - | - |\n"
+    )
     commit_all(repo)
     problems = audit(repo, AuditConfig(index="INDEX.md"))
     assert any("other.json has no row" in p for p in problems)

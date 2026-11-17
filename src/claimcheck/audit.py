@@ -108,15 +108,23 @@ def derivable(candidate: float, decimals: int, pool: set[float], table: set[floa
 
 def split_row(row: str) -> list[str]:
     ph = "\x00PIPE\x00"
-    return [c.strip().replace(ph, "|") for c in row.replace("\\|", ph).strip().strip("|").split("|")]
+    return [
+        c.strip().replace(ph, "|") for c in row.replace("\\|", ph).strip().strip("|").split("|")
+    ]
 
 
 def is_separator(cells: list[str]) -> bool:
     return bool(cells) and all(set(c) <= set("-: ") for c in cells)
 
 
-def _check_table(rel: str, rows: list[str], pools: list[set[float]], tags: list[str],
-                 allow: tuple[re.Pattern[str], ...], allow_values: frozenset[float]) -> list[str]:
+def _check_table(
+    rel: str,
+    rows: list[str],
+    pools: list[set[float]],
+    tags: list[str],
+    allow: tuple[re.Pattern[str], ...],
+    allow_values: frozenset[float],
+) -> list[str]:
     if any(NO_MANIFEST_MARKER in r for r in rows):
         return []  # a declared historical table: exempt, and it says so
     table_numbers: set[float] = set()
@@ -195,10 +203,22 @@ def check_index(root: Path, cfg: AuditConfig) -> list[str]:
     index = root / cfg.index
     if not index.exists():
         return [f"{cfg.index}: file not found"]
-    rows = set(re.findall(rf"^\|\s*`{re.escape(cfg.results_dir)}/([^`]+\.json)`", index.read_text(encoding="utf-8"), re.M))
+    rows = set(
+        re.findall(
+            rf"^\|\s*`{re.escape(cfg.results_dir)}/([^`]+\.json)`",
+            index.read_text(encoding="utf-8"),
+            re.M,
+        )
+    )
     tracked = _tracked_manifests(root, cfg.results_dir)
-    problems = [f"{cfg.index}: tracked manifest {cfg.results_dir}/{n} has no row" for n in sorted(tracked - rows)]
-    problems += [f"{cfg.index}: row for {cfg.results_dir}/{n} names a manifest that is not tracked" for n in sorted(rows - tracked)]
+    problems = [
+        f"{cfg.index}: tracked manifest {cfg.results_dir}/{n} has no row"
+        for n in sorted(tracked - rows)
+    ]
+    problems += [
+        f"{cfg.index}: row for {cfg.results_dir}/{n} names a manifest that is not tracked"
+        for n in sorted(rows - tracked)
+    ]
     return problems
 
 

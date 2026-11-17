@@ -106,7 +106,9 @@ def check_document(doc: Path, root: Path) -> list[str]:
             if fig is None:
                 problems.append(f"{doc}: includes missing figure '{ref}'")
             elif not git_tracked(fig, root):
-                problems.append(f"{doc}: figure '{ref}' is not tracked; no clean clone can build it")
+                problems.append(
+                    f"{doc}: figure '{ref}' is not tracked; no clean clone can build it"
+                )
         return problems
 
     for rel in sorted(set(FIGURE_RE.findall(text))):

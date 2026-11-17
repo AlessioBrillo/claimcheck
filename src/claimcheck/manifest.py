@@ -58,7 +58,9 @@ def aggregate_metrics(per_seed: Sequence[dict[str, float]]) -> dict[str, dict[st
     return out
 
 
-def git_provenance(cwd: Path | None = None, ignore_dirs: Sequence[str] = ("results/",)) -> tuple[str, bool]:
+def git_provenance(
+    cwd: Path | None = None, ignore_dirs: Sequence[str] = ("results/",)
+) -> tuple[str, bool]:
     """(short SHA, tree is dirty). `("unknown", True)` when git is unavailable.
 
     Changes under `ignore_dirs` do not count as dirty: a manifest is written by the very
